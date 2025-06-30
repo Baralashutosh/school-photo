@@ -10,61 +10,47 @@
       padding: 40px;
       background: #f5f5f5;
     }
-    input {
+    input, button {
       padding: 10px;
       font-size: 16px;
-      width: 200px;
+      margin: 5px;
     }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-left: 10px;
-      cursor: pointer;
+    #photo-container img {
+      margin-top: 20px;
+      max-width: 320px;
+      border-radius: 10px;
     }
-    #photo-container {
-      margin-top: 30px;
-    }
-    img {
-      max-width: 90%;
-      margin-top: 10px;
-    }
-    #footer {
-      margin-top: 50px;
-      font-size: 14px;
+    footer {
+      margin-top: 40px;
       color: #555;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h2>🎉 Download Your School Photo</h2>
-  <p>Enter your unique passcode:</p>
-  <input type="text" id="passcode" maxlength="10" placeholder="e.g., 7036">
-  <button onclick="findPhoto()">View Photo</button>
+  <h2>🎓 School Photo Portal</h2>
+  <p>Enter your unique 4-digit passcode:</p>
+  <input type="text" id="passcode" placeholder="e.g. 7036" maxlength="6">
+  <button onclick="checkPasscode()">View Photo</button>
 
-  <div id="error" style="color: red; margin-top: 10px;"></div>
+  <div id="error" style="color:red; margin-top:10px;"></div>
   <div id="photo-container"></div>
 
-  <div id="footer">
-    ❤️ Made with love by Ashutosh Baral
-  </div>
+  <footer>
+    Made with ❤️ Ashutosh Baral
+  </footer>
 
   <script>
     let passcodes = {};
 
-    // Load passcodes.json
     fetch('passcodes.json')
       .then(response => response.json())
-      .then(data => {
-        passcodes = data;
-      })
-      .catch(() => {
-        document.getElementById('error').innerText = "⚠️ Failed to load passcodes data.";
-      });
+      .then(data => { passcodes = data; });
 
-    function findPhoto() {
-      const code = document.getElementById('passcode').value.trim();
-      const container = document.getElementById('photo-container');
-      const error = document.getElementById('error');
+    function checkPasscode() {
+      const code = document.getElementById("passcode").value.trim();
+      const container = document.getElementById("photo-container");
+      const error = document.getElementById("error");
       container.innerHTML = "";
       error.innerText = "";
 
@@ -73,24 +59,16 @@
         return;
       }
 
-      const driveUrl = passcodes[code];
-      const embedUrl = driveUrl.replace("/view?usp=drivesdk", "/preview");
+      const url = passcodes[code];
+      const previewUrl = url.replace("/view?usp=drivesdk", "/preview");
 
-      const iframe = document.createElement('iframe');
-      iframe.src = embedUrl;
-      iframe.width = "320";
-      iframe.height = "240";
-      iframe.allow = "autoplay";
-
-      const download = document.createElement('a');
-      download.href = driveUrl;
-      download.target = "_blank";
-      download.innerHTML = "<button>📥 Download Photo</button>";
-      download.style.display = "inline-block";
-      download.style.marginTop = "10px";
-
-      container.appendChild(iframe);
-      container.appendChild(download);
+      container.innerHTML = `
+        ✅ <strong>Photo Found!</strong><br><br>
+        <iframe src="${previewUrl}" width="320" height="240" allow="autoplay"></iframe><br><br>
+        <a href="${url}" target="_blank">
+          <button>⬇️ Download Photo</button>
+        </a>
+      `;
     }
   </script>
 </body>
