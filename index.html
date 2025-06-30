@@ -122,13 +122,18 @@
         }
 
         const url = passcodes[code];
-        result.innerHTML = `
-          ✅ <strong>Photo Found!</strong><br><br>
-          <iframe src="${url.replace('/view?usp=drivesdk', '/preview')}" width="320" height="240"></iframe><br><br>
-          <a href="${url}" target="_blank">
-            <button>📥 Download Photo</button>
-          </a>
-        `;
+// Extract the file ID from the URL
+const fileId = url.match(/\/d\/(.+?)\//)[1];
+// Create the direct download link
+const directLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+result.innerHTML = `
+  ✅ <strong>Photo Found!</strong><br><br>
+  <iframe src="${url.replace('/view?usp=drivesdk', '/preview')}" width="320" height="240"></iframe><br><br>
+  <a href="${directLink}">
+    <button>📥 Download Photo</button>
+  </a>
+`;
         result.style.opacity = 1;
       }, 1000);
     }
