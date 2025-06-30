@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Retrieve Your Photo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🎓 School Photo Portal</h1>
+  <p>Enter your unique passcode:</p>
+  <input type="text" id="passcode" maxlength="6" />
+  <button onclick="findPhoto()">View Photo</button>
+  <div id="error"></div>
+  <div id="photo-container"></div>
+
+  <script>
+    let passcodes = {};
+
+    fetch('passcodes.json')
+      .then(response => response.json())
+      .then(data => { passcodes = data; })
+      .catch(() => {
+        document.getElementById('error').innerText = "Failed to load passcode data.";
+      });
+
+    function findPhoto() {
+      const code = document.getElementById('passcode').value.trim();
+      const container = document.getElementById('photo-container');
+      const error = document.getElementById('error');
+      container.innerHTML = "";
+      error.innerText = "";
+
+      if (!passcodes[code]) {
+        error.innerText = "Invalid passcode. Try again.";
+        return;
+      }
+
+      const url = passcodes[code];
+      const img = document.createElement('img');
+      img.src = url;
+
+      const download = document.createElement('a');
+      download.href = url;
+      download.innerText = "⬇️ Download Photo";
+      download.download = "photo.jpg";
+      download.style.display = "block";
+      download.style.marginTop = "10px";
+
+      container.appendChild(img);
+      container.appendChild(download);
+    }
+  </script>
+</body>
+</html>
