@@ -1,6 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
+  <title>Photo Download Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+      background: #f5f5f5;
+    }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+    }
+    #result {
+      margin-top: 30px;
+    }
+    iframe {
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <h2>🎉 Download Your Photo</h2>
+  <p>Enter your 4-digit passcode:</p>
+  <input type="text" id="passcode" placeholder="e.g., 4827">
+  <button onclick="checkPasscode()">Submit</button>
+  <div id="result"></div>
+
+  <script>
+    function checkPasscode() {
+      const userInput = document.getElementById("passcode").value.trim();
+      if (userInput === "") {
+        document.getElementById("result").innerHTML = "⚠️ Please enter a passcode.";
+        return;
+      }
+
+      fetch("passcodes.json")
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Failed to load passcodes.json");
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data[userInput]) {
+            const photoLink = data[userInput];
+            document.getElementById("result").innerHTML = `
+              ✅ <b>Photo Found!</b><br><br>
+              <iframe src="${photoLink.replace('/view?usp=drivesdk', '/preview')}" width="320" height="240"></iframe><br><br>
+              <a href="${photoLink}" target="_blank">
+                <button>📥 Download Photo</button>
+              </a>
+            `;
+          } else {
+            document.getElementById("result").innerHTML = "❌ Invalid passcode. Try again.";
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("result").innerHTML = "⚠️ Error loading data.";
+        });
+    }
+  </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html>
+<head>
   <meta charset="UTF-8" />
   <title>Retrieve Your Photo</title>
   <link rel="stylesheet" href="style.css">
