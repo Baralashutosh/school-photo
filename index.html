@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Photo Download Portal</title>
+  <title>🎓 School Photo Portal</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,83 +19,46 @@
       padding: 10px 20px;
       font-size: 16px;
       margin-left: 10px;
+      cursor: pointer;
     }
-    #result {
+    #photo-container {
       margin-top: 30px;
     }
-    iframe {
-      border: none;
+    img {
+      max-width: 90%;
+      margin-top: 10px;
+    }
+    #footer {
+      margin-top: 50px;
+      font-size: 14px;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h2>🎉 Download Your Photo</h2>
-  <p>Enter your 4-digit passcode:</p>
-  <input type="text" id="passcode" placeholder="e.g., 4827">
-  <button onclick="checkPasscode()">Submit</button>
-  <div id="result"></div>
-
-  <script>
-    function checkPasscode() {
-      const userInput = document.getElementById("passcode").value.trim();
-      if (userInput === "") {
-        document.getElementById("result").innerHTML = "⚠️ Please enter a passcode.";
-        return;
-      }
-
-      fetch("passcodes.json")
-        .then(response => {
-          if (!response.ok) {
-            throw new Error("Failed to load passcodes.json");
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (data[userInput]) {
-            const photoLink = data[userInput];
-            document.getElementById("result").innerHTML = `
-              ✅ <b>Photo Found!</b><br><br>
-              <iframe src="${photoLink.replace('/view?usp=drivesdk', '/preview')}" width="320" height="240"></iframe><br><br>
-              <a href="${photoLink}" target="_blank">
-                <button>📥 Download Photo</button>
-              </a>
-            `;
-          } else {
-            document.getElementById("result").innerHTML = "❌ Invalid passcode. Try again.";
-          }
-        })
-        .catch(error => {
-          console.error(error);
-          document.getElementById("result").innerHTML = "⚠️ Error loading data.";
-        });
-    }
-  </script>
-</body>
-</html>
-
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <title>Retrieve Your Photo</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>🎓 School Photo Portal</h1>
+  <h2>🎉 Download Your School Photo</h2>
   <p>Enter your unique passcode:</p>
-  <input type="text" id="passcode" maxlength="6" />
+  <input type="text" id="passcode" maxlength="10" placeholder="e.g., 7036">
   <button onclick="findPhoto()">View Photo</button>
-  <div id="error"></div>
+
+  <div id="error" style="color: red; margin-top: 10px;"></div>
   <div id="photo-container"></div>
+
+  <div id="footer">
+    ❤️ Made with love by Ashutosh Baral
+  </div>
 
   <script>
     let passcodes = {};
 
+    // Load passcodes.json
     fetch('passcodes.json')
       .then(response => response.json())
-      .then(data => { passcodes = data; })
+      .then(data => {
+        passcodes = data;
+      })
       .catch(() => {
-        document.getElementById('error').innerText = "Failed to load passcode data.";
+        document.getElementById('error').innerText = "⚠️ Failed to load passcodes data.";
       });
 
     function findPhoto() {
@@ -106,22 +69,27 @@
       error.innerText = "";
 
       if (!passcodes[code]) {
-        error.innerText = "Invalid passcode. Try again.";
+        error.innerText = "❌ Invalid passcode. Try again.";
         return;
       }
 
-      const url = passcodes[code];
-      const img = document.createElement('img');
-      img.src = url;
+      const driveUrl = passcodes[code];
+      const embedUrl = driveUrl.replace("/view?usp=drivesdk", "/preview");
+
+      const iframe = document.createElement('iframe');
+      iframe.src = embedUrl;
+      iframe.width = "320";
+      iframe.height = "240";
+      iframe.allow = "autoplay";
 
       const download = document.createElement('a');
-      download.href = url;
-      download.innerText = "⬇️ Download Photo";
-      download.download = "photo.jpg";
-      download.style.display = "block";
+      download.href = driveUrl;
+      download.target = "_blank";
+      download.innerHTML = "<button>📥 Download Photo</button>";
+      download.style.display = "inline-block";
       download.style.marginTop = "10px";
 
-      container.appendChild(img);
+      container.appendChild(iframe);
       container.appendChild(download);
     }
   </script>
